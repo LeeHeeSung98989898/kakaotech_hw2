@@ -1,7 +1,9 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePokemon } from '../context/PokemonContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { addPokemon, removePokemon } from '../redux/pokemonSlice';
 import MOCK_DATA from '../data/MOCK_DATA';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
 
 const Container = styled.div`
   padding: 20px;
@@ -47,7 +49,8 @@ const Button = styled.button`
 function PokemonDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selected, addPokemon, removePokemon } = usePokemon();
+  const dispatch = useDispatch();
+  const selected = useSelector((state) => state.pokemon.selected);
 
   const pokemon = MOCK_DATA.find((p) => p.id === Number(id));
   if (!pokemon) return <p>해당 포켓몬을 찾을 수 없습니다.</p>;
@@ -56,9 +59,15 @@ function PokemonDetail() {
 
   const handleClick = () => {
     if (isSelected) {
-      removePokemon(pokemon.id);
+      dispatch(removePokemon(pokemon.id));
+      toast.info(`${pokemon.korean_name}을(를) 삭제했습니다.`);
     } else {
-      addPokemon(pokemon);
+      if (selected.length >= 6) {
+        toast.warn('더 이상 선택할 수 없습니다.');
+        return;
+      }
+      dispatch(addPokemon(pokemon));
+      toast.success(`${pokemon.korean_name}을(를) 추가했습니다!`);
     }
   };
 

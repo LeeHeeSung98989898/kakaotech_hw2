@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { usePokemon } from '../context/PokemonContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { addPokemon, removePokemon } from '../redux/pokemonSlice';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
 
 const Card = styled.div`
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   padding: 12px;
-  width: 140px; /* ✅ 카드 폭 줄이기 */
+  width: 140px;
   text-align: center;
   transition: transform 0.2s;
 
@@ -17,7 +19,7 @@ const Card = styled.div`
 `;
 
 const Image = styled.img`
-  width: 80px; /* ✅ 이미지 크기 조정 */
+  width: 80px;
   height: auto;
   cursor: pointer;
 `;
@@ -34,8 +36,8 @@ const Type = styled.p`
   margin: 0;
 `;
 
-const AddButton = styled.button`
-  background: #ff3b3b;
+const ActionButton = styled.button`
+  background: ${({ isRemove }) => (isRemove ? '#777' : '#ff3b3b')};
   color: white;
   border: none;
   border-radius: 6px;
@@ -45,13 +47,30 @@ const AddButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background: #d32f2f;
+    background: ${({ isRemove }) => (isRemove ? '#555' : '#d32f2f')};
   }
 `;
 
 function PokemonCard({ pokemon }) {
   const navigate = useNavigate();
-  const { addPokemon } = usePokemon();
+  const dispatch = useDispatch();
+  const selected = useSelector((state) => state.pokemon.selected);
+
+  const isSelected = selected.some((p) => p.id === pokemon.id);
+
+  const handleClick = () => {
+    if (isSelected) {
+      dispatch(removePokemon(pokemon.id));
+      toast.info(`${pokemon.korean_name}을(를) 삭제했습니다.`);
+    } else {
+      if (selected.length >= 6) {
+        toast.warn('더 이상 선택할 수 없습니다.');
+        return;
+      }
+      dispatch(addPokemon(pokemon));
+      toast.success(`${pokemon.korean_name}을(를) 추가했습니다!`);
+    }
+  };
 
   if (!pokemon) return null;
 
@@ -64,7 +83,9 @@ function PokemonCard({ pokemon }) {
       />
       <Name>{pokemon.korean_name}</Name>
       <Type>{pokemon.types.join(', ')}</Type>
-      <AddButton onClick={() => addPokemon(pokemon)}>추가</AddButton>
+      <ActionButton onClick={handleClick} isRemove={isSelected}>
+        {isSelected ? '삭제' : '추가'}
+      </ActionButton>
     </Card>
   );
 }

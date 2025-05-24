@@ -1,4 +1,5 @@
-import { usePokemon } from '../context/PokemonContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { removePokemon } from '../redux/pokemonSlice';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -63,8 +64,9 @@ const DeleteButton = styled.button`
 `;
 
 function Dashboard() {
-  const { selected, removePokemon } = usePokemon();
-  
+  const selected = useSelector((state) => state.pokemon.selected);
+  const dispatch = useDispatch();
+
   const cards = [];
   for (let i = 0; i < 6; i++) {
     const pokemon = selected[i];
@@ -74,7 +76,9 @@ function Dashboard() {
           <Image src={pokemon.img_url} alt={pokemon.korean_name} />
           <Name>{pokemon.korean_name}</Name>
           <IdText>No. {pokemon.id.toString().padStart(3, '0')}</IdText>
-          <DeleteButton onClick={() => removePokemon(pokemon.id)}>삭제</DeleteButton>
+          <DeleteButton onClick={() => dispatch(removePokemon(pokemon.id))}>
+            삭제
+          </DeleteButton>
         </Card>
       );
     } else {
