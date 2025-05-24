@@ -7,7 +7,7 @@ const Card = styled.div`
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   padding: 12px;
-  width: 140px; /* ✅ 카드 폭 줄이기 */
+  width: 140px;
   text-align: center;
   transition: transform 0.2s;
 
@@ -17,7 +17,7 @@ const Card = styled.div`
 `;
 
 const Image = styled.img`
-  width: 80px; /* ✅ 이미지 크기 조정 */
+  width: 80px;
   height: auto;
   cursor: pointer;
 `;
